@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="HTTPReplay",
-    version="1.0",
+    version="1.0.1",
     author="Hatching B.V.",
     author_email="info@hatching.io",
     packages=[
@@ -19,7 +19,7 @@ setup(
     install_requires=[
         "dpkt>=1.9.6, <1.10",
         "tlslite-ng==0.7.6",
-        "click>=7.0.0, <7.2",
+        "click>=8.1.2",
         "brotli==1.0.9, <1.1",
         "future"
     ],
