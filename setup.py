@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="HTTPReplay",
-    version="1.0.1",
+    version="1.0.2",
     author="Hatching B.V.",
     author_email="info@hatching.io",
     packages=[
@@ -18,12 +18,12 @@ setup(
     description="Properly interpret, decrypt, and replay pcap files",
     install_requires=[
         "dpkt>=1.9.6, <1.10",
-        "tlslite-ng==0.7.6",
+        "tlslite-ng==0.8.1",
         "click>=8.1.2",
-        "brotli==1.0.9, <1.1",
+        "brotli==1.1.0, <1.2",
         "future"
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.10",
     extras_require={
         "mitmproxy": [
             "mitmproxy==4.0.4",
