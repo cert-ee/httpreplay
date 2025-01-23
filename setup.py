@@ -18,7 +18,7 @@ setup(
     description="Properly interpret, decrypt, and replay pcap files",
     install_requires=[
         "dpkt>=1.9.6, <1.10",
-        "tlslite-ng==0.8.1",
+        "tlslite-ng==0.8.2",
         "click>=8.1.2",
         "brotli==1.1.0, <1.2",
         "future"
