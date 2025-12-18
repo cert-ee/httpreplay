@@ -468,24 +468,25 @@ class _TLSStream(tlslite.tlsrecordlayer.TLSRecordLayer):
         self.client_state = self._recordLayer._pendingWriteState
         return True
 
-    def decrypt(self, state, record_type, buf):
+    def decrypt(self, state, record):
         self._recordLayer._readState = state
         if state.encContext.isBlockCipher:
             return bytes(self._recordLayer._decryptThenMAC(
-                record_type, bytearray(buf)
+                record.type, bytearray(record.data)
             ))
         elif state.encContext.isAEAD:
+            # Continue here
             return bytes(self._recordLayer._decryptAndUnseal(
-                record_type, bytearray(buf)
+                record, bytearray(record.data)
             ))
         else:
             return bytes(self._recordLayer._decryptStreamThenMAC(
-                record_type, bytearray(buf)
+                record.type, bytearray(record.data)
             ))
 
-    def decrypt_server(self, record_type, buf):
+    def decrypt_server(self, record):
         try:
-            return self.decrypt(self.server_state, record_type, buf)
+            return self.decrypt(self.server_state, record)
         except tlslite.errors.TLSBadRecordMAC as e:
             log.warning("Bad MAC record, cannot decrypt server stream. %s", e)
             return b""
@@ -495,9 +496,9 @@ class _TLSStream(tlslite.tlsrecordlayer.TLSRecordLayer):
             )
             return b""
 
-    def decrypt_client(self, record_type, buf):
+    def decrypt_client(self, record):
         try:
-            return self.decrypt(self.client_state, record_type, buf)
+            return self.decrypt(self.client_state, record)
         except tlslite.errors.TLSBadRecordMAC as e:
             log.warning("Bad MAC record, cannot decrypt client stream. %s", e)
             return b""
@@ -622,10 +623,10 @@ class TLSStream(Protocol):
             return
 
         record = self.recv.pop(0)
-        self.tls.decrypt_server(record.type, record.data)
+        self.tls.decrypt_server(record)
 
         record = self.sent.pop(0)
-        self.tls.decrypt_client(record.type, record.data)
+        self.tls.decrypt_client(record)
 
         self.state = "stream"
         return True
@@ -635,7 +636,7 @@ class TLSStream(Protocol):
             sent = []
             while self.sent:
                 record = self.sent.pop(0)
-                sent.append(self.tls.decrypt_client(record.type, record.data))
+                sent.append(self.tls.decrypt_client(record))
 
             recv = []
             while self.recv:
@@ -643,7 +644,7 @@ class TLSStream(Protocol):
 
                 try:
                     recv.append(
-                        self.tls.decrypt_server(record.type, record.data)
+                        self.tls.decrypt_server(record)
                     )
                 except tlslite.errors.TLSProtocolException:
                     log.info(
